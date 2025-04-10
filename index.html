@@ -114,32 +114,26 @@
     </div>
 
     <script>
-        // Lista de códigos válidos (200 códigos alfanuméricos)
+        // Nuevos códigos alfanuméricos (200 códigos)
         const validCodes = [
-            // Códigos originales (numéricos)
-            "1234", "5678", "9012", "3456", "7890", "0123", "4567", "8901", "2345", "6789", 
-            "9876", "5432", "1098", "7654", "3210", "8765", "4321", "0987", "6543", "2109", 
-            "1122", "3344", "5566", "7788", "9900", "2244", "6688", "0022", "4466", "8800", 
-            "1357", "2468", "3579", "4680", "5791", "6802", "7913", "8024", "9135", "0246", 
-            "1470", "2581", "3692", "4703", "5814", "6925", "7036", "8147", "9258", "0369", 
-            "1591", "2602", "3713", "4824", "5935", "6046", "7157", "8268", "9379", "0480", 
-            "1604", "2715", "3826", "4937", "5048", "6159", "7260", "8371", "9482", "0593", 
-            "1727", "2838", "3949", "4050", "5161", "6272", "7383", "8494", "9505", "0616", 
-            "1840", "2951", "3062", "4173", "5284", "6395", "7406", "8517", "9628", "0739", 
-            "1963", "2074", "3185", "4296", "5307", "6418", "7529", "8630", "9741", "0852",
-
-            // Códigos alfanuméricos premium
-            "A7b9", "C3f8", "E5j2", "G9k4", "I1m6", "K8n0", "M2p5", "O4q7", "Q6r1", "S0t3",
-            "U9v5", "W7x8", "Y5z2", "B4a6", "D8c0", "F2e9", "H6g3", "J0i5", "L9k7", "N3m1",
-            "P5o4", "R7q6", "T1s8", "V3u0", "X9w2", "Z4y5", "a7B9", "c3F8", "e5J2", "g9K4",
-            "i1M6", "k8N0", "m2P5", "o4Q7", "q6R1", "s0T3", "u9V5", "w7X8", "y5Z2", "b4A6",
-            "d8C0", "f2E9", "h6G3", "j0I5", "l9K7", "n3M1", "p5O4", "r7Q6", "t1S8", "v3U0",
-            "x9W2", "z4Y5", "A1c7", "B2d9", "C3e1", "D4f3", "E5g5", "F6h7", "G7i9", "H8j1",
-            "I9k3", "J0l5", "K1m7", "L2n9", "M3o1", "N4p3", "O5q5", "P6r7", "Q7s9", "R8t1",
-            "S9u3", "T0v5", "U1w7", "V2x9", "W3y1", "X4z3", "Y5a5", "Z6b7", "a7c9", "b8d1",
-            "c9e3", "d0f5", "e1g7", "f2h9", "g3i1", "h4j3", "i5k5", "j6l7", "k7m9", "l8n1",
-            "m9o3", "n0p5", "o1q7", "p2r9", "q3s1", "r4t3", "s5u5", "t6v7", "u7w9", "v8x1",
-            "w9y3", "x0z5", "y1A7", "z2B9", "0C3d", "1D5e", "2E7f", "3F9g", "4G1h", "5H3j"
+            "X9K5", "P3L8", "M7N2", "B4V6", "C1F9", "D8G3", "E5H7", "F2J1", "G9K4", "H6L0",
+            "J3M7", "K0N4", "L7P1", "N4Q8", "O1R5", "Q8S2", "R5T9", "S2U6", "T9V3", "U6W0",
+            "V3X7", "W0Y4", "Y7Z1", "Z4A8", "A1B5", "B8C2", "C5D9", "D2E6", "E9F3", "F6G0",
+            "G3H7", "H0I4", "I7J1", "J4K8", "K1L5", "L8M2", "M5N9", "N2O6", "O9P3", "P6Q0",
+            "Q3R7", "R0S4", "S7T1", "T4U8", "U1V5", "V8W2", "W5X9", "X2Y6", "Y9Z3", "Z6A0",
+            "A7B1", "B4C8", "C1D5", "D8E2", "E5F9", "F2G6", "G9H3", "H6I0", "I3J7", "J0K4",
+            "K7L1", "L4M8", "M1N5", "N8O2", "O5P9", "P2Q6", "Q9R3", "R6S0", "S3T7", "T0U4",
+            "U7V1", "V4W8", "W1X5", "X8Y2", "Y5Z9", "Z2A6", "A9B3", "B6C0", "C3D7", "D0E4",
+            "E7F1", "F4G8", "G1H5", "H8I2", "I5J9", "J2K6", "K9L3", "L6M0", "M3N7", "N0O4",
+            "O7P1", "P4Q8", "Q1R5", "R8S2", "S5T9", "T2U6", "U9V3", "V6W0", "W3X7", "X0Y4",
+            "Y7Z1", "Z4A8", "A1B5", "B8C2", "C5D9", "D2E6", "E9F3", "F6G0", "G3H7", "H0I4",
+            "I7J1", "J4K8", "K1L5", "L8M2", "M5N9", "N2O6", "O9P3", "P6Q0", "Q3R7", "R0S4",
+            "S7T1", "T4U8", "U1V5", "V8W2", "W5X9", "X2Y6", "Y9Z3", "Z6A0", "A7B1", "B4C8",
+            "C1D5", "D8E2", "E5F9", "F2G6", "G9H3", "H6I0", "I3J7", "J0K4", "K7L1", "L4M8",
+            "M1N5", "N8O2", "O5P9", "P2Q6", "Q9R3", "R6S0", "S3T7", "T0U4", "U7V1", "V4W8",
+            "W1X5", "X8Y2", "Y5Z9", "Z2A6", "A9B3", "B6C0", "C3D7", "D0E4", "E7F1", "F4G8",
+            "G1H5", "H8I2", "I5J9", "J2K6", "K9L3", "L6M0", "M3N7", "N0O4", "O7P1", "P4Q8",
+            "Q1R5", "R8S2", "S5T9", "T2U6", "U9V3", "V6W0", "W3X7", "X0Y4", "Y7Z1", "Z4A8"
         ];
 
         // Generar ID único del dispositivo
@@ -200,36 +194,42 @@
                 return;
             }
 
-            // Verificar uso previo del código
+            // Verificar uso del código (máximo 2 dispositivos)
             if (!usedCodes[code]) {
                 // Primer uso: registrar dispositivo
                 usedCodes[code] = {
-                    deviceId: deviceId,
+                    devices: [deviceId],
                     firstUsed: new Date().toISOString(),
                     lastUsed: new Date().toISOString()
                 };
                 localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
-                successElement.textContent = "¡Acceso concedido! Redirigiendo...";
-                
-                // Guardar estado de acceso y redirigir
-                localStorage.setItem("accessGranted", "true");
-                localStorage.setItem("lastValidCode", code);
-                
-                // Pequeño retraso para mostrar el mensaje
-                setTimeout(() => {
-                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
-                }, 1500);
-                
-            } else if (usedCodes[code].deviceId === deviceId) {
-                // Mismo dispositivo: acceso permitido
+            } 
+            else if (usedCodes[code].devices.includes(deviceId)) {
+                // Dispositivo ya registrado con este código
                 usedCodes[code].lastUsed = new Date().toISOString();
                 localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
-                localStorage.setItem("accessGranted", "true");
-                showPremiumContent();
-            } else {
-                // Código ya usado en otro dispositivo
-                errorElement.textContent = "⚠️ Este código ya está en uso en otro dispositivo. Cada código es válido para un solo equipo.";
             }
+            else if (usedCodes[code].devices.length < 2) {
+                // Segundo dispositivo permitido
+                usedCodes[code].devices.push(deviceId);
+                usedCodes[code].lastUsed = new Date().toISOString();
+                localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+            }
+            else {
+                // Código ya usado en 2 dispositivos
+                errorElement.textContent = "⚠️ Este código ya ha sido activado en 2 dispositivos. Cada código tiene un límite de 2 activaciones.";
+                return;
+            }
+
+            // Acceso concedido
+            successElement.textContent = "¡Acceso concedido! Redirigiendo...";
+            localStorage.setItem("accessGranted", "true");
+            localStorage.setItem("lastValidCode", code);
+            
+            // Redirigir a la página del sistema
+            setTimeout(() => {
+                window.location.href = "https://luishparedes.github.io/magica_pro-web/";
+            }, 1500);
         });
 
         // Cerrar sesión
@@ -242,8 +242,9 @@
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem("accessGranted") === "true") {
                 const savedCode = localStorage.getItem("lastValidCode");
-                if (savedCode && usedCodes[savedCode]?.deviceId === deviceId) {
-                    showPremiumContent();
+                if (savedCode && usedCodes[savedCode]?.devices?.includes(deviceId)) {
+                    // Redirigir directamente al sistema si ya tiene acceso
+                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
                 } else {
                     showAccessScreen();
                 }
