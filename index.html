@@ -1,29 +1,256 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora Mágica</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Seguro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            transition: all 0.3s ease;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3e8e41;
+        }
+        #calculator {
+            display: none;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            min-height: 1.2rem;
+        }
+        .success-message {
+            color: #27ae60;
+            margin-top: 1rem;
+        }
+        .logo {
+            max-width: 120px;
+            margin-bottom: 1.5rem;
+        }
+        #logout {
+            background-color: #e74c3c;
+        }
+        #logout:hover {
+            background-color: #c0392b;
+        }
+    </style>
 </head>
 <body>
-  <div id="access-screen" class="access-screen">
-    <h1>Calculadora Mágica</h1>
-    <p>Impulsa la rentabilidad de tu negocio</p>
-    <p>¡Adquiere el código fuente y transforma tus finanzas!</p>
-    <p>Pago único a través de Binance: <a href="mailto:luishparedes94@gmail.com">luishparedes94@gmail.com</a></p>
-    <p>Confirma tu pago y recibe el código: <a href="mailto:luishparedes94@gmail.com">luishparedes94@gmail.com</a></p>
-    <p>Contacto: <a href="tel:+584125278450">04125278450</a> (Programador Luis Paredes)</p>
-    <form id="access-form">
-      <input type="text" id="code" placeholder="Ingresa tu código" aria-label="Ingresa tu código">
-      <button type="submit">Acceder</button>
-    </form>
-  </div>
+    <div class="container">
+        <!-- Pantalla de acceso -->
+        <div id="access-screen">
+            <img src="https://via.placeholder.com/120x60?text=LOGO" alt="Logo" class="logo">
+            <h1>Acceso a la Herramienta Premium</h1>
+            <form id="access-form">
+                <input type="text" id="code" placeholder="Ingresa tu código de acceso" required
+                       maxlength="4" pattern="[A-Za-z0-9]{4}" title="4 caracteres alfanuméricos">
+                <button type="submit" id="submit-btn">Ingresar</button>
+            </form>
+            <p class="error" id="error-message"></p>
+            <p class="success-message" id="success-message"></p>
+        </div>
 
-  <div id="calculator" class="calculator" style="display: none;">
-    <button id="logout">Cerrar sesión</button>
-  </div>
+        <!-- Contenido protegido -->
+        <div id="calculator">
+            <img src="https://via.placeholder.com/120x60?text=LOGO" alt="Logo" class="logo">
+            <h1>Bienvenido a tu Herramienta</h1>
+            <p>Contenido exclusivo para usuarios autorizados.</p>
+            <div id="premium-content">
+                <!-- Aquí iría el contenido premium -->
+                <p>¡Disfruta de todas las funciones premium!</p>
+            </div>
+            <button id="logout">Cerrar sesión</button>
+        </div>
+    </div>
 
-  <script src="script.js"></script>
+    <script>
+        // Lista de códigos válidos (200 códigos alfanuméricos)
+        const validCodes = [
+            // Códigos originales (numéricos)
+            "1234", "5678", "9012", "3456", "7890", "0123", "4567", "8901", "2345", "6789", 
+            "9876", "5432", "1098", "7654", "3210", "8765", "4321", "0987", "6543", "2109", 
+            "1122", "3344", "5566", "7788", "9900", "2244", "6688", "0022", "4466", "8800", 
+            "1357", "2468", "3579", "4680", "5791", "6802", "7913", "8024", "9135", "0246", 
+            "1470", "2581", "3692", "4703", "5814", "6925", "7036", "8147", "9258", "0369", 
+            "1591", "2602", "3713", "4824", "5935", "6046", "7157", "8268", "9379", "0480", 
+            "1604", "2715", "3826", "4937", "5048", "6159", "7260", "8371", "9482", "0593", 
+            "1727", "2838", "3949", "4050", "5161", "6272", "7383", "8494", "9505", "0616", 
+            "1840", "2951", "3062", "4173", "5284", "6395", "7406", "8517", "9628", "0739", 
+            "1963", "2074", "3185", "4296", "5307", "6418", "7529", "8630", "9741", "0852",
+
+            // Códigos alfanuméricos premium
+            "A7b9", "C3f8", "E5j2", "G9k4", "I1m6", "K8n0", "M2p5", "O4q7", "Q6r1", "S0t3",
+            "U9v5", "W7x8", "Y5z2", "B4a6", "D8c0", "F2e9", "H6g3", "J0i5", "L9k7", "N3m1",
+            "P5o4", "R7q6", "T1s8", "V3u0", "X9w2", "Z4y5", "a7B9", "c3F8", "e5J2", "g9K4",
+            "i1M6", "k8N0", "m2P5", "o4Q7", "q6R1", "s0T3", "u9V5", "w7X8", "y5Z2", "b4A6",
+            "d8C0", "f2E9", "h6G3", "j0I5", "l9K7", "n3M1", "p5O4", "r7Q6", "t1S8", "v3U0",
+            "x9W2", "z4Y5", "A1c7", "B2d9", "C3e1", "D4f3", "E5g5", "F6h7", "G7i9", "H8j1",
+            "I9k3", "J0l5", "K1m7", "L2n9", "M3o1", "N4p3", "O5q5", "P6r7", "Q7s9", "R8t1",
+            "S9u3", "T0v5", "U1w7", "V2x9", "W3y1", "X4z3", "Y5a5", "Z6b7", "a7c9", "b8d1",
+            "c9e3", "d0f5", "e1g7", "f2h9", "g3i1", "h4j3", "i5k5", "j6l7", "k7m9", "l8n1",
+            "m9o3", "n0p5", "o1q7", "p2r9", "q3s1", "r4t3", "s5u5", "t6v7", "u7w9", "v8x1",
+            "w9y3", "x0z5", "y1A7", "z2B9", "0C3d", "1D5e", "2E7f", "3F9g", "4G1h", "5H3j"
+        ];
+
+        // Generar ID único del dispositivo
+        function generateDeviceId() {
+            const components = [
+                navigator.userAgent,
+                navigator.platform,
+                navigator.hardwareConcurrency || 'unknown',
+                screen.width,
+                screen.height,
+                navigator.deviceMemory || 'unknown'
+            ];
+            return components.join('-');
+        }
+
+        const deviceId = generateDeviceId();
+        let usedCodes = JSON.parse(localStorage.getItem("usedCodes")) || {};
+
+        // Mostrar pantalla de acceso
+        function showAccessScreen() {
+            document.getElementById("access-screen").style.display = "block";
+            document.getElementById("calculator").style.display = "none";
+            document.getElementById("error-message").textContent = "";
+            document.getElementById("success-message").textContent = "";
+            document.getElementById("code").value = "";
+            document.getElementById("code").focus();
+        }
+
+        // Mostrar contenido premium
+        function showPremiumContent() {
+            document.getElementById("access-screen").style.display = "none";
+            document.getElementById("calculator").style.display = "block";
+        }
+
+        // Validar código de acceso
+        document.getElementById("access-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const codeInput = document.getElementById("code");
+            const code = codeInput.value.trim().toUpperCase();
+            const errorElement = document.getElementById("error-message");
+            const successElement = document.getElementById("success-message");
+            
+            // Reset messages
+            errorElement.textContent = "";
+            successElement.textContent = "";
+
+            // Validación básica
+            if (!/^[A-Z0-9]{4}$/.test(code)) {
+                errorElement.textContent = "El código debe tener exactamente 4 caracteres alfanuméricos.";
+                codeInput.focus();
+                return;
+            }
+
+            // Verificar si el código es válido
+            if (!validCodes.includes(code)) {
+                errorElement.textContent = "Código incorrecto. Por favor, verifica e intenta nuevamente.";
+                codeInput.focus();
+                return;
+            }
+
+            // Verificar uso previo del código
+            if (!usedCodes[code]) {
+                // Primer uso: registrar dispositivo
+                usedCodes[code] = {
+                    deviceId: deviceId,
+                    firstUsed: new Date().toISOString(),
+                    lastUsed: new Date().toISOString()
+                };
+                localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+                successElement.textContent = "¡Acceso concedido! Redirigiendo...";
+                
+                // Guardar estado de acceso y redirigir
+                localStorage.setItem("accessGranted", "true");
+                localStorage.setItem("lastValidCode", code);
+                
+                // Pequeño retraso para mostrar el mensaje
+                setTimeout(() => {
+                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
+                }, 1500);
+                
+            } else if (usedCodes[code].deviceId === deviceId) {
+                // Mismo dispositivo: acceso permitido
+                usedCodes[code].lastUsed = new Date().toISOString();
+                localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+                localStorage.setItem("accessGranted", "true");
+                showPremiumContent();
+            } else {
+                // Código ya usado en otro dispositivo
+                errorElement.textContent = "⚠️ Este código ya está en uso en otro dispositivo. Cada código es válido para un solo equipo.";
+            }
+        });
+
+        // Cerrar sesión
+        document.getElementById("logout").addEventListener("click", function() {
+            localStorage.removeItem("accessGranted");
+            showAccessScreen();
+        });
+
+        // Al cargar la página: verificar acceso previo
+        document.addEventListener("DOMContentLoaded", function() {
+            if (localStorage.getItem("accessGranted") === "true") {
+                const savedCode = localStorage.getItem("lastValidCode");
+                if (savedCode && usedCodes[savedCode]?.deviceId === deviceId) {
+                    showPremiumContent();
+                } else {
+                    showAccessScreen();
+                }
+            } else {
+                showAccessScreen();
+            }
+        });
+    </script>
 </body>
 </html>
