@@ -83,6 +83,11 @@
         #logout:hover {
             background-color: #c0392b;
         }
+        .support-info {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
     </style>
 </head>
 <body>
@@ -98,6 +103,9 @@
             </form>
             <p class="error" id="error-message"></p>
             <p class="success-message" id="success-message"></p>
+            <div class="support-info">
+                Soporte técnico: 04125278450
+            </div>
         </div>
 
         <!-- Contenido protegido -->
@@ -194,7 +202,7 @@
                 return;
             }
 
-            // Verificar uso del código (máximo 2 dispositivos)
+            // Verificar uso del código (máximo 4 dispositivos)
             if (!usedCodes[code]) {
                 // Primer uso: registrar dispositivo
                 usedCodes[code] = {
@@ -209,15 +217,15 @@
                 usedCodes[code].lastUsed = new Date().toISOString();
                 localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
             }
-            else if (usedCodes[code].devices.length < 2) {
-                // Segundo dispositivo permitido
+            else if (usedCodes[code].devices.length < 4) {
+                // Dispositivos adicionales permitidos (hasta 4)
                 usedCodes[code].devices.push(deviceId);
                 usedCodes[code].lastUsed = new Date().toISOString();
                 localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
             }
             else {
-                // Código ya usado en 2 dispositivos
-                errorElement.textContent = "⚠️ Este código ya ha sido activado en 2 dispositivos. Cada código tiene un límite de 2 activaciones.";
+                // Código ya usado en 4 dispositivos
+                errorElement.textContent = "⚠️ Este código ha excedido el límite de 4 activaciones. Contacta a soporte: 04125278450";
                 return;
             }
 
@@ -238,19 +246,18 @@
             showAccessScreen();
         });
 
-        // Al cargar la página: verificar acceso previo
+        // Al cargar la página: REINICIO SEGURO - Todos los usuarios deben ingresar código nuevamente
         document.addEventListener("DOMContentLoaded", function() {
-            if (localStorage.getItem("accessGranted") === "true") {
-                const savedCode = localStorage.getItem("lastValidCode");
-                if (savedCode && usedCodes[savedCode]?.devices?.includes(deviceId)) {
-                    // Redirigir directamente al sistema si ya tiene acceso
-                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
-                } else {
-                    showAccessScreen();
-                }
-            } else {
-                showAccessScreen();
-            }
+            // Eliminamos solo el acceso concedido, preservando usedCodes
+            localStorage.removeItem("accessGranted");
+            showAccessScreen(); // Siempre muestra el formulario de acceso
+            
+            // Opcional: Mostrar mensaje informativo (puedes personalizarlo)
+            const infoElement = document.createElement('div');
+            infoElement.style.color = '#3498db';
+            infoElement.style.marginTop = '1rem';
+            infoElement.textContent = "Por seguridad, todos los usuarios deben ingresar su código nuevamente.";
+            document.getElementById("access-screen").appendChild(infoElement);
         });
     </script>
 </body>
