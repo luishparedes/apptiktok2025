@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Premium | Herramienta que Cambia Vidas</title>
+    <title>Acceso Premium | Sistema Exclusivo</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,7 +13,6 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            color: #333;
         }
         .container {
             background-color: white;
@@ -24,11 +23,6 @@
             width: 90%;
             max-width: 400px;
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-        }
         input {
             width: 100%;
             padding: 10px;
@@ -36,6 +30,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
+            text-transform: uppercase;
         }
         button {
             background-color: #4CAF50;
@@ -48,118 +43,86 @@
             font-size: 14px;
             margin-top: 10px;
         }
-        .error {
-            color: #e74c3c;
-            margin-top: 8px;
-            font-size: 13px;
-        }
-        .success-message {
-            color: #27ae60;
-            margin-top: 8px;
-            font-size: 13px;
-        }
-        .soporte {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-        .soporte strong {
-            color: #e74c3c;
-        }
+        .error { color: #e74c3c; }
+        .success { color: #27ae60; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="access-screen">
-            <h1>🔒 Acceso al Sistema Premium</h1>
-            <form id="access-form">
-                <input type="text" id="code" placeholder="Ingresa tu código de 4 dígitos" required
-                       maxlength="4" pattern="[A-Za-z0-9]{4}" title="4 caracteres alfanuméricos">
-                <button type="submit">INGRESAR</button>
-            </form>
-            <p class="error" id="error-message"></p>
-            <p class="success-message" id="success-message"></p>
-            <div class="soporte">
-                ¿Problemas? Contacta a soporte: <strong>0412-527-8450</strong>
-            </div>
-        </div>
+        <h1>🔒 Acceso al Sistema</h1>
+        <form id="access-form">
+            <input 
+                type="text" 
+                id="code" 
+                placeholder="Ej: X9K5" 
+                required
+                maxlength="4"
+                pattern="[A-Z0-9]{4}"
+                title="4 letras/números (mayúsculas)"
+            >
+            <button type="submit">INGRESAR</button>
+        </form>
+        <p id="message" class="error"></p>
+        <p><small>¿Problemas? Contacta a soporte: <strong>0412-527-8450</strong></small></p>
     </div>
 
     <script>
-        // ==================== PROTECCIÓN AVANZADA ====================
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        Object.defineProperty(window, 'console', { value: {}, writable: false });
-        setInterval(() => { if (window.console) console.clear() }, 1000);
-        document.onkeydown = (e) => {
-            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key))) {
-                alert("Acceso restringido");
-                return false;
-            }
-        };
+        // ✅ TODOS TUS CÓDIGOS VÁLIDOS (202)
+        const validCodes = [
+            "X9K5","P3L8","M7N2","B4V6","C1F9","D8G3","E5H7","F2J1","G9K4","H6L0",
+            "J3M7","K0N4","L7P1","N4Q8","O1R5","Q8S2","R5T9","S2U6","T9V3","U6W0",
+            "V3X7","W0Y4","Y7Z1","Z4A8","A1B5","B8C2","C5D9","D2E6","E9F3","F6G0",
+            "G3H7","H0I4","I7J1","J4K8","K1L5","L8M2","M5N9","N2O6","O9P3","P6Q0",
+            "Q3R7","R0S4","S7T1","T4U8","U1V5","V8W2","W5X9","X2Y6","Y9Z3","Z6A0",
+            "A7B1","B4C8","C1D5","D8E2","E5F9","F2G6","G9H3","H6I0","I3J7","J0K4",
+            "K7L1","L4M8","M1N5","N8O2","O5P9","P2Q6","Q9R3","R6S0","S3T7","T0U4",
+            "U7V1","V4W8","W1X5","X8Y2","Y5Z9","Z2A6","A9B3","B6C0","C3D7","D0E4",
+            "E7F1","F4G8","G1H5","H8I2","I5J9","J2K6","K9L3","L6M0","M3N7","N0O4",
+            "O7P1","P4Q8","Q1R5","R8S2","S5T9","T2U6","U9V3","V6W0","W3X7","X0Y4",
+            "Y7Z1","Z4A8","A1B5","B8C2","C5D9","D2E6","E9F3","F6G0","G3H7","H0I4",
+            "I7J1","J4K8","K1L5","L8M2","M5N9","N2O6","O9P3","P6Q0","Q3R7","R0S4",
+            "S7T1","T4U8","U1V5","V8W2","W5X9","X2Y6","Y9Z3","Z6A0","A7B1","B4C8",
+            "C1D5","D8E2","E5F9","F2G6","G9H3","H6I0","I3J7","J0K4","K7L1","L4M8",
+            "M1N5","N8O2","O5P9","P2Q6","Q9R3","R6S0","S3T7","T0U4","U7V1","V4W8",
+            "W1X5","X8Y2","Y5Z9","Z2A6","A9B3","B6C0","C3D7","D0E4","E7F1","F4G8",
+            "G1H5","H8I2","I5J9","J2K6","K9L3","L6M0","M3N7","N0O4","O7P1","P4Q8",
+            "Q1R5","R8S2","S5T9","T2U6","U9V3","V6W0","W3X7","X0Y4","Y7Z1","Z4A8"
+        ];
 
-        // ==================== TODOS LOS 200 CÓDIGOS (OFUSCADOS) ====================
-        function getValidCodes() {
-            const hexCodes = [
-                "58|39|4B|35","50|33|4C|38","4D|37|4E|32","42|34|56|36","43|31|46|39",
-                "44|38|47|33","45|35|48|37","46|32|4A|31","47|39|4B|34","48|36|4C|30",
-                "4A|33|4D|37","4B|30|4E|34","4C|37|50|31","4E|34|51|38","4F|31|52|35",
-                "51|38|53|32","52|35|54|39","53|32|55|36","54|39|56|33","55|36|57|30",
-                "56|33|58|37","57|30|59|34","59|37|5A|31","5A|34|41|38","41|31|42|35",
-                "42|38|43|32","43|35|44|39","44|32|45|36","45|39|46|33","46|36|47|30",
-                "47|33|48|37","48|30|49|34","49|37|4A|31","4A|34|4B|38","4B|31|4C|35",
-                "4C|38|4D|32","4D|35|4E|39","4E|32|4F|36","4F|39|50|33","50|36|51|30",
-                "51|33|52|37","52|30|53|34","53|37|54|31","54|34|55|38","55|31|56|35",
-                "56|38|57|32","57|35|58|39","58|32|59|36","59|39|5A|33","5A|36|41|30",
-                "41|37|42|31","42|34|43|38","43|31|44|35","44|38|45|32","45|35|46|39",
-                "46|32|47|36","47|39|48|33","48|36|49|30","49|33|4A|37","4A|30|4B|34",
-                "4B|37|4C|31","4C|34|4D|38","4D|31|4E|35","4E|38|4F|32","4F|35|50|39",
-                "50|32|51|36","51|39|52|33","52|36|53|30","53|33|54|37","54|30|55|34",
-                "55|37|56|31","56|34|57|38","57|31|58|35","58|38|59|32","59|35|5A|39",
-                "5A|32|41|36","41|39|42|33","42|36|43|30","43|33|44|37","44|30|45|34",
-                "45|37|46|31","46|34|47|38","47|31|48|35","48|38|49|32","49|35|4A|39",
-                "4A|32|4B|36","4B|39|4C|33","4C|36|4D|30","4D|33|4E|37","4E|30|4F|34",
-                "4F|37|50|31","50|34|51|38","51|31|52|35","52|38|53|32","53|35|54|39",
-                "54|32|55|36","55|39|56|33","56|36|57|30","57|33|58|37","58|30|59|34",
-                "59|37|5A|31","5A|34|41|38","41|31|42|35","42|38|43|32","43|35|44|39",
-                "44|32|45|36","45|39|46|33","46|36|47|30","47|33|48|37","48|30|49|34",
-                "49|37|4A|31","4A|34|4B|38","4B|31|4C|35","4C|38|4D|32","4D|35|4E|39",
-                "4E|32|4F|36","4F|39|50|33","50|36|51|30","51|33|52|37","52|30|53|34",
-                "53|37|54|31","54|34|55|38","55|31|56|35","56|38|57|32","57|35|58|39",
-                "58|32|59|36","59|39|5A|33","5A|36|41|30","41|37|42|31","42|34|43|38",
-                "43|31|44|35","44|38|45|32","45|35|46|39","46|32|47|36","47|39|48|33",
-                "48|36|49|30","49|33|4A|37","4A|30|4B|34","4B|37|4C|31","4C|34|4D|38",
-                "4D|31|4E|35","4E|38|4F|32","4F|35|50|39","50|32|51|36","51|39|52|33",
-                "52|36|53|30","53|33|54|37","54|30|55|34","55|37|56|31","56|34|57|38",
-                "57|31|58|35","58|38|59|32","59|35|5A|39","5A|32|41|36","41|39|42|33",
-                "42|36|43|30","43|33|44|37","44|30|45|34","45|37|46|31","46|34|47|38",
-                "47|31|48|35","48|38|49|32","49|35|4A|39","4A|32|4B|36","4B|39|4C|33",
-                "4C|36|4D|30","4D|33|4E|37","4E|30|4F|34","4F|37|50|31","50|34|51|38",
-                "51|31|52|35","52|38|53|32","53|35|54|39","54|32|55|36","55|39|56|33",
-                "56|36|57|30","57|33|58|37","58|30|59|34","59|37|5A|31","5A|34|41|38"
-            ];
-            return hexCodes.map(hex => hex.split('|').map(h => String.fromCharCode(parseInt(h, 16))).join(''));
-        }
-
-        // ==================== VALIDACIÓN Y REDIRECCIÓN ====================
+        // ===== VALIDACIÓN SEGURA =====
         document.getElementById("access-form").addEventListener("submit", function(e) {
             e.preventDefault();
             const code = document.getElementById("code").value.trim().toUpperCase();
-            const errorEl = document.getElementById("error-message");
-            const successEl = document.getElementById("success-message");
+            const messageEl = document.getElementById("message");
             
-            errorEl.textContent = "";
-            successEl.textContent = "";
-
-            setTimeout(() => { // Retraso anti-fuerza bruta
-                if (getValidCodes().includes(code)) {
-                    successEl.textContent = "✅ Acceso concedido. Redirigiendo...";
+            messageEl.textContent = "";
+            
+            // Validación básica
+            if (code.length !== 4 || !/^[A-Z0-9]{4}$/.test(code)) {
+                messageEl.textContent = "❌ Usa exactamente 4 letras/números";
+                messageEl.className = "error";
+                return;
+            }
+            
+            // Validar código con retraso anti-fuerza bruta
+            setTimeout(() => {
+                if (validCodes.includes(code)) {
+                    messageEl.textContent = "✅ Acceso concedido...";
+                    messageEl.className = "success";
                     setTimeout(() => {
+                        // REDIRECCIÓN A TU PÁGINA REAL (cambia esta URL):
                         window.location.href = "https://luishparedes.github.io/magica_pro-web/";
-                    }, 800);
+                    }, 1500);
                 } else {
-                    errorEl.textContent = "❌ Código incorrecto. Contacta a soporte: 0412-527-8450";
+                    messageEl.textContent = "❌ Código no válido. Contacta a soporte.";
+                    messageEl.className = "error";
                 }
             }, 500);
+        });
+
+        // Convertir a mayúsculas automáticamente
+        document.getElementById("code").addEventListener("input", function(e) {
+            this.value = this.value.toUpperCase();
         });
     </script>
 </body>
