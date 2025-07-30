@@ -1,21 +1,21 @@
 // 🔐 Configuración de Seguridad Avanzada
 const SECURITY_CONFIG = {
     MAX_DEVICES: 3,
-    INACTIVITY_TIMEOUT: 10 * 60 * 1000, // 10 minutos
-    CODE_VALIDATION_DELAY: 800, // Retraso anti-fuerza bruta
-    SALT: "xQ9#pL2$kM5&vR1" // Sal para hashing
+    INACTIVITY_TIMEOUT: 10 * 60 * 1000,
+    CODE_VALIDATION_DELAY: 800,
+    SALT: "xQ9#pL2$kM5&vR1"
 };
 
-// 🏷️ Todos los códigos válidos (antiguos y nuevos)
+// 🏷️ Todos los códigos válidos
 const VALID_CODES = {
-    // Nuevos códigos en formato usuario*clave
-    "CARLOS*1111": true,
+    // Nuevos códigos (usuario*clave)
+    "carlos*1111": true,
     "laura*2112": true,
     "maria*2222": true,
     "juan*3333": true,
     "ana*4444": true,
     
-    // Todos los códigos antiguos (4 caracteres)
+    // Códigos antiguos (4 caracteres)
     "P3L8": true, "M7N2": true, "B4V6": true, "C1F9": true, "D8G3": true,
     "E5H7": true, "F2J1": true, "G9K4": true, "H6L0": true, "J3M7": true,
     "K0N4": true, "L7P1": true, "N4Q8": true, "O1R5": true, "Q8S2": true,
@@ -86,7 +86,7 @@ const VALID_CODES = {
     "M8R2": true, "N5S9": true, "O2T6": true, "P9U3": true, "Q6V0": true
 };
 
-// 🛡️ Sistema de Seguridad Mejorado (clase completa)
+// 🛡️ Sistema de Seguridad Mejorado
 class CodeSecuritySystem {
     constructor() {
         this.initSessionProtection();
@@ -212,18 +212,27 @@ class CodeSecuritySystem {
     validateAccessCode(code) {
         return new Promise(resolve => {
             setTimeout(() => {
-                if (!VALID_CODES[code]) {
+                // Para códigos antiguos (4 caracteres), convertimos a mayúsculas
+                if (code.length === 4 && !code.includes('*')) {
+                    code = code.toUpperCase();
+                }
+                
+                // Para códigos nuevos (usuario*clave), conservamos el case exacto
+                if (!VALID_CODES[code] && !VALID_CODES[code.toLowerCase()]) {
                     resolve({ valid: false, error: "Credenciales no válidas" });
                     return;
                 }
 
-                const registration = this.registerDevice(code);
+                // Usamos la versión exacta que está en VALID_CODES
+                const validCode = VALID_CODES[code] ? code : code.toLowerCase();
+                const registration = this.registerDevice(validCode);
+                
                 if (!registration.success) {
                     resolve({ valid: false, error: registration.reason });
                     return;
                 }
 
-                localStorage.setItem('currentValidCode', code);
+                localStorage.setItem('currentValidCode', validCode);
                 sessionStorage.setItem('activeSessionToken', this.hashString(Date.now().toString()));
                 
                 resolve({ valid: true, isNewDevice: registration.isNew });
@@ -263,10 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     codeInput.addEventListener('input', function() {
+        // Permitimos cualquier combinación de mayúsculas/minúsculas
         this.value = this.value.replace(/[^a-zA-Z0-9*]/g, '');
         
         if (this.value.length >= (this.value.includes('*') ? 3 : 4)) {
-            const info = securitySystem.getDeviceRegistrationInfo(this.value);
+            const checkCode = this.value.includes('*') ? this.value : this.value.toUpperCase();
+            const info = securitySystem.getDeviceRegistrationInfo(checkCode);
             updateDeviceInfoDisplay(info);
         } else {
             deviceInfoEl.textContent = '';
@@ -296,15 +307,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     accessForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const code = codeInput.value.trim();
+        let code = codeInput.value.trim();
         
-        // Validación para ambos formatos
+        // Determinamos el tipo de código
         if (code.includes('*')) {
+            // Código nuevo (usuario*clave) - conservamos case exacto
             if (code.split('*').length !== 2 || code.split('*')[0].length < 1 || code.split('*')[1].length < 1) {
                 showMessage("❌ Formato incorrecto. Usa: usuario*clave", "error");
                 return;
             }
         } else {
+            // Código antiguo - convertimos a mayúsculas
+            code = code.toUpperCase();
             if (code.length !== 4 || !/^[A-Z0-9]{4}$/.test(code)) {
                 showMessage("❌ El código debe tener 4 caracteres alfanuméricos", "error");
                 return;
@@ -313,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showMessage("🔒 Verificando credenciales...", "info");
         
-        const result = await securitySystem.validateAccessCode(code.toUpperCase());
+        const result = await securitySystem.validateAccessCode(code);
         
         if (result.valid) {
             showMessage("✅ Acceso concedido...", "success");
