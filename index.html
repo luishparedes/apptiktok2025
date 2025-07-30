@@ -13,11 +13,10 @@
             <input 
                 type="text" 
                 id="code" 
-                placeholder="Ej: A1B2" 
+                placeholder="Ej: usuario*clave o ABCD" 
                 required
-                maxlength="4"
-                pattern="[A-Z0-9]{4}"
-                title="4 letras/números (mayúsculas)"
+                pattern="[a-zA-Z0-9*]+"
+                title="Formato: usuario*clave o código de 4 caracteres"
             >
             <button type="submit">INGRESAR</button>
         </form>
