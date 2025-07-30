@@ -13,12 +13,16 @@
             <input 
                 type="text" 
                 id="code" 
-                placeholder="Ej: usuario*clave" 
+                placeholder="Ej: A1B2" 
                 required
+                maxlength="4"
+                pattern="[A-Z0-9]{4}"
+                title="4 letras/números (mayúsculas)"
             >
             <button type="submit">INGRESAR</button>
         </form>
         <p id="message" class="error"></p>
+        <p id="device-info" class="info"></p>
         <p class="warning"><small>Horario de soporte: <strong>8:00 AM - 4:00 PM</strong></small></p>
         <p><small>¿Problemas? Contacta a soporte: <strong>0412-527-8450</strong></small></p>
     </div>
