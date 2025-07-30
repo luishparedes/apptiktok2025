@@ -14,6 +14,7 @@ const VALID_CODES = {
     "maria*2222": true,
     "juan*3333": true,
     "ana*4444": true,
+    "santiago*2711": true,
     
     // Códigos antiguos (4 caracteres)
     "P3L8": true, "M7N2": true, "B4V6": true, "C1F9": true, "D8G3": true,
