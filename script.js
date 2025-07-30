@@ -9,7 +9,7 @@ const SECURITY_CONFIG = {
 // 🏷️ Todos los códigos válidos (antiguos y nuevos)
 const VALID_CODES = {
     // Nuevos códigos en formato usuario*clave
-    "carlos*1111": true,
+    "CARLOS*1111": true,
     "laura*2112": true,
     "maria*2222": true,
     "juan*3333": true,
