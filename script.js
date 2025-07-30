@@ -1,22 +1,12 @@
-// 🔐 Configuración de Seguridad Avanzada
-const SECURITY_CONFIG = {
-    MAX_DEVICES: 3,
-    INACTIVITY_TIMEOUT: 10 * 60 * 1000,
-    CODE_VALIDATION_DELAY: 800,
-    SALT: "xQ9#pL2$kM5&vR1"
-};
-
-// 🏷️ Todos los códigos válidos
+// 🏷️ LISTA DE CÓDIGOS VÁLIDOS (AGREGA TUS CÓDIGOS AQUÍ)
 const VALID_CODES = {
-    // Nuevos códigos (usuario*clave)
+    // Ejemplos (puedes borrar estos y poner los tuyos)
     "carlos*1111": true,
     "laura*2112": true,
+    "santiago*2711": true,
     "maria*2222": true,
     "juan*3333": true,
-    "ana*4444": true,
-    "santiago*2711": true,
-    
-    // Códigos antiguos (4 caracteres)
+    "ana*4444": true
     "P3L8": true, "M7N2": true, "B4V6": true, "C1F9": true, "D8G3": true,
     "E5H7": true, "F2J1": true, "G9K4": true, "H6L0": true, "J3M7": true,
     "K0N4": true, "L7P1": true, "N4Q8": true, "O1R5": true, "Q8S2": true,
@@ -87,261 +77,52 @@ const VALID_CODES = {
     "M8R2": true, "N5S9": true, "O2T6": true, "P9U3": true, "Q6V0": true
 };
 
-// 🛡️ Sistema de Seguridad Mejorado
-class CodeSecuritySystem {
-    constructor() {
-        this.initSessionProtection();
-        this.checkExistingSession();
-    }
-
-    generateDeviceId() {
-        const storedId = localStorage.getItem('secureDeviceId');
-        if (storedId) return storedId;
-
-        const fingerprint = [
-            navigator.userAgent,
-            navigator.hardwareConcurrency,
-            screen.width,
-            screen.height,
-            navigator.deviceMemory,
-            SECURITY_CONFIG.SALT
-        ].join('|');
-
-        const deviceId = this.hashString(fingerprint) + '-' + Date.now().toString(36);
-        localStorage.setItem('secureDeviceId', deviceId);
-        return deviceId;
-    }
-
-    hashString(str) {
-        let hash = 5381;
-        for (let i = 0; i < str.length; i++) {
-            hash = (hash * 33) ^ str.charCodeAt(i);
-        }
-        return (hash >>> 0).toString(36);
-    }
-
-    getRegisteredDevices(code) {
-        const encrypted = localStorage.getItem(`encDevices_${code}`);
-        if (!encrypted) return [];
-
-        try {
-            const decrypted = this.decryptData(encrypted);
-            return JSON.parse(decrypted) || [];
-        } catch (e) {
-            console.error("Error al decodificar dispositivos:", e);
-            return [];
-        }
-    }
-
-    registerDevice(code) {
-        const deviceId = this.generateDeviceId();
-        const devices = this.getRegisteredDevices(code);
-
-        if (devices.some(dev => dev.id === deviceId)) {
-            return { success: true, isNew: false };
-        }
-
-        if (devices.length >= SECURITY_CONFIG.MAX_DEVICES) {
-            return { success: false, reason: "Límite de dispositivos alcanzado" };
-        }
-
-        devices.push({
-            id: deviceId,
-            timestamp: Date.now(),
-            ua: navigator.userAgent.substring(0, 50)
-        });
-
-        localStorage.setItem(`encDevices_${code}`, this.encryptData(JSON.stringify(devices)));
-        return { success: true, isNew: true };
-    }
-
-    encryptData(data) {
-        return btoa(unescape(encodeURIComponent(data + SECURITY_CONFIG.SALT)));
-    }
-
-    decryptData(encrypted) {
-        try {
-            const decoded = decodeURIComponent(escape(atob(encrypted)));
-            return decoded.replace(SECURITY_CONFIG.SALT, '');
-        } catch (e) {
-            console.error("Error al descifrar:", e);
-            return '';
-        }
-    }
-
-    initSessionProtection() {
-        const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
-        events.forEach(evt => {
-            document.addEventListener(evt, this.resetInactivityTimer.bind(this));
-        });
-
-        this.resetInactivityTimer();
-    }
-
-    resetInactivityTimer() {
-        clearTimeout(this.inactivityTimer);
-        this.inactivityTimer = setTimeout(() => {
-            this.handleInactiveSession();
-        }, SECURITY_CONFIG.INACTIVITY_TIMEOUT);
-    }
-
-    handleInactiveSession() {
-        const currentCode = localStorage.getItem('currentValidCode');
-        sessionStorage.removeItem('activeSessionToken');
-        
-        if (currentCode) {
-            window.location.href = window.location.pathname;
-        }
-    }
-
-    checkExistingSession() {
-        const savedCode = localStorage.getItem('currentValidCode');
-        const sessionToken = sessionStorage.getItem('activeSessionToken');
-        
-        if (savedCode && sessionToken) {
-            const devices = this.getRegisteredDevices(savedCode);
-            const deviceId = this.generateDeviceId();
-            
-            if (devices.some(dev => dev.id === deviceId)) {
-                setTimeout(() => {
-                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
-                }, 500);
-            }
-        }
-    }
-
-    validateAccessCode(code) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                // Para códigos antiguos (4 caracteres), convertimos a mayúsculas
-                if (code.length === 4 && !code.includes('*')) {
-                    code = code.toUpperCase();
-                }
-                
-                // Para códigos nuevos (usuario*clave), conservamos el case exacto
-                if (!VALID_CODES[code] && !VALID_CODES[code.toLowerCase()]) {
-                    resolve({ valid: false, error: "Credenciales no válidas" });
-                    return;
-                }
-
-                // Usamos la versión exacta que está en VALID_CODES
-                const validCode = VALID_CODES[code] ? code : code.toLowerCase();
-                const registration = this.registerDevice(validCode);
-                
-                if (!registration.success) {
-                    resolve({ valid: false, error: registration.reason });
-                    return;
-                }
-
-                localStorage.setItem('currentValidCode', validCode);
-                sessionStorage.setItem('activeSessionToken', this.hashString(Date.now().toString()));
-                
-                resolve({ valid: true, isNewDevice: registration.isNew });
-            }, SECURITY_CONFIG.CODE_VALIDATION_DELAY);
-        });
-    }
-
-    getDeviceRegistrationInfo(code) {
-        const devices = this.getRegisteredDevices(code);
-        const currentDeviceId = this.generateDeviceId();
-        
-        const isCurrentRegistered = devices.some(dev => dev.id === currentDeviceId);
-        const availableSlots = SECURITY_CONFIG.MAX_DEVICES - devices.length;
-        
-        return {
-            isRegistered: isCurrentRegistered,
-            registeredDevices: devices.length,
-            maxDevices: SECURITY_CONFIG.MAX_DEVICES,
-            availableSlots: availableSlots > 0 ? availableSlots : 0
-        };
-    }
-}
-
-// 🚀 Inicialización del Sistema
+// 🛡️ SISTEMA DE ACCESO
 document.addEventListener('DOMContentLoaded', () => {
-    const securitySystem = new CodeSecuritySystem();
     const accessForm = document.getElementById('access-form');
     const codeInput = document.getElementById('code');
     const messageEl = document.getElementById('message');
-    const deviceInfoEl = document.getElementById('device-info');
 
+    // Verificar si ya hay una sesión activa
     const savedCode = localStorage.getItem('currentValidCode');
-    if (savedCode) {
-        codeInput.value = savedCode;
-        const info = securitySystem.getDeviceRegistrationInfo(savedCode);
-        updateDeviceInfoDisplay(info);
+    if (savedCode && VALID_CODES[savedCode]) {
+        messageEl.textContent = "✅ Sesión activa encontrada";
+        messageEl.className = "success";
+        setTimeout(() => {
+            window.location.href = "https://luishparedes.github.io/magica_pro-web/";
+        }, 1000);
     }
 
-    codeInput.addEventListener('input', function() {
-        // Permitimos cualquier combinación de mayúsculas/minúsculas
-        this.value = this.value.replace(/[^a-zA-Z0-9*]/g, '');
-        
-        if (this.value.length >= (this.value.includes('*') ? 3 : 4)) {
-            const checkCode = this.value.includes('*') ? this.value : this.value.toUpperCase();
-            const info = securitySystem.getDeviceRegistrationInfo(checkCode);
-            updateDeviceInfoDisplay(info);
-        } else {
-            deviceInfoEl.textContent = '';
-        }
-    });
-
-    function updateDeviceInfoDisplay(info) {
-        if (!info || info.registeredDevices === 0) {
-            deviceInfoEl.textContent = '';
-            return;
-        }
-
-        if (info.isRegistered) {
-            deviceInfoEl.innerHTML = `✅ Este dispositivo está registrado<br>
-                                     <small>Dispositivos: ${info.registeredDevices}/${info.maxDevices}</small>`;
-            deviceInfoEl.className = 'success';
-        } else if (info.availableSlots > 0) {
-            deviceInfoEl.innerHTML = `⚠️ Este código tiene ${info.registeredDevices} de ${info.maxDevices} dispositivos<br>
-                                     <small>Aún puedes registrar ${info.availableSlots} más</small>`;
-            deviceInfoEl.className = 'warning';
-        } else {
-            deviceInfoEl.innerHTML = `❌ Límite de dispositivos alcanzado<br>
-                                     <small>Este código ya tiene ${info.maxDevices} dispositivos registrados</small>`;
-            deviceInfoEl.className = 'error';
-        }
-    }
-
-    accessForm.addEventListener('submit', async function(e) {
+    // Manejar el envío del formulario
+    accessForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        let code = codeInput.value.trim();
+        const code = codeInput.value.trim();
         
-        // Determinamos el tipo de código
-        if (code.includes('*')) {
-            // Código nuevo (usuario*clave) - conservamos case exacto
-            if (code.split('*').length !== 2 || code.split('*')[0].length < 1 || code.split('*')[1].length < 1) {
-                showMessage("❌ Formato incorrecto. Usa: usuario*clave", "error");
-                return;
-            }
-        } else {
-            // Código antiguo - convertimos a mayúsculas
-            code = code.toUpperCase();
-            if (code.length !== 4 || !/^[A-Z0-9]{4}$/.test(code)) {
-                showMessage("❌ El código debe tener 4 caracteres alfanuméricos", "error");
-                return;
-            }
+        // Validar el formato (usuario*clave)
+        if (!code.includes('*') || code.split('*').length !== 2) {
+            showMessage("❌ Formato incorrecto. Usa: usuario*clave", "error");
+            return;
         }
 
         showMessage("🔒 Verificando credenciales...", "info");
         
-        const result = await securitySystem.validateAccessCode(code);
-        
-        if (result.valid) {
-            showMessage("✅ Acceso concedido...", "success");
-            setTimeout(() => {
-                window.location.href = "https://luishparedes.github.io/magica_pro-web/";
-            }, 1500);
-        } else {
-            showMessage(`❌ ${result.error}`, "error");
-        }
+        // Simular retraso de verificación
+        setTimeout(() => {
+            if (VALID_CODES[code]) {
+                // Guardar el código válido
+                localStorage.setItem('currentValidCode', code);
+                showMessage("✅ Acceso concedido...", "success");
+                setTimeout(() => {
+                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
+                }, 1500);
+            } else {
+                showMessage("❌ Credenciales no válidas", "error");
+            }
+        }, 800);
     });
 
     function showMessage(text, type) {
-        messageEl.innerHTML = text;
+        messageEl.textContent = text;
         messageEl.className = type;
     }
 });
