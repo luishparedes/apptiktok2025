@@ -4,7 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Premium | Sistema Exclusivo</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .error {
+            color: #e74c3c;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+        .info {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .warning {
+            color: #e67e22;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        small {
+            font-size: 13px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -27,6 +96,54 @@
         <p><small>¿Problemas? Contacta a soporte: <strong>0412-527-8450</strong></small></p>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('access-form');
+        const codeInput = document.getElementById('code');
+        const messageEl = document.getElementById('message');
+        const deviceInfoEl = document.getElementById('device-info');
+
+        // Auto-mayúsculas y validación en tiempo real
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        // Manejar envío del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = codeInput.value.trim();
+            
+            // Validación básica del formato
+            if (code.length !== 4 || !/^[A-Z0-9]{4}$/.test(code)) {
+                messageEl.textContent = 'El código debe tener 4 caracteres alfanuméricos';
+                return;
+            }
+
+            // Validación del código (EJEMPLO: usa "MASS" como código válido)
+            if (code === 'MASS') { // ✅ Reemplaza esto con tu lógica de validación real
+                messageEl.textContent = '✅ Verificando acceso...';
+                messageEl.style.color = '#27ae60';
+                
+                // Generar token de acceso (compatible con la calculadora)
+                const token = {
+                    valor: 'tk_' + Math.random().toString(36).substr(2, 16) + Date.now(),
+                    expira: Date.now() + 360000 // 6 minutos
+                };
+                
+                // Guardar token y redirigir
+                localStorage.setItem('calc_token', JSON.stringify(token));
+                window.location.href = 'https://luishparedes.github.io/massiel/?token=' + encodeURIComponent(token.valor);
+                
+            } else {
+                // Código incorrecto
+                messageEl.textContent = '❌ Código incorrecto. Intenta nuevamente.';
+                messageEl.style.color = '#e74c3c';
+            }
+        });
+
+        // Mostrar información del dispositivo
+        deviceInfoEl.textContent = `Dispositivo: ${navigator.platform} | ${navigator.userAgent.split(' ')[0]}`;
+    });
+    </script>
 </body>
 </html>
