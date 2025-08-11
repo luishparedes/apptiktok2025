@@ -146,7 +146,7 @@ class CodeSecuritySystem {
             if (devices.some(dev => dev.id === deviceId)) {
                 // Redirigir al contenido protegido
                 setTimeout(() => {
-                    window.location.href = "https://luishparedes.github.io/massiel/";
+                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
                 }, 500);
             }
         }
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.valid) {
             showMessage("✅ Acceso concedido...", "success");
             setTimeout(() => {
-                window.location.href = "https://luishparedes.github.io/massiel/";
+                window.location.href = "https://luishparedes.github.io/magica_pro-web/";
             }, 1500);
         } else {
             showMessage(`❌ ${result.error}`, "error");
