@@ -3,7 +3,8 @@ const SECURITY_CONFIG = {
     MAX_DEVICES: 3,
     INACTIVITY_TIMEOUT: 10 * 60 * 1000, // 10 minutos
     CODE_VALIDATION_DELAY: 800, // Retraso anti-fuerza bruta
-    SALT: "xQ9#pL2$kM5&vR1" // Sal para hashing
+    SALT: "xQ9#pL2$kM5&vR1", // Sal para hashing
+    REDIRECT_URL: "https://luishparedes.github.io/magica_pro-web/" // ✅ NUEVA URL CENTRALIZADA
 };
 
 // 🏷️ Códigos válidos (ofuscados con encoding múltiple)
@@ -90,7 +91,6 @@ class CodeSecuritySystem {
 
     // 🔐 Cifrado básico de datos
     encryptData(data) {
-        // Nota: En un entorno real, usa Web Crypto API o similar
         return btoa(unescape(encodeURIComponent(data + SECURITY_CONFIG.SALT)));
     }
 
@@ -144,9 +144,9 @@ class CodeSecuritySystem {
             const deviceId = this.generateDeviceId();
             
             if (devices.some(dev => dev.id === deviceId)) {
-                // Redirigir al contenido protegido
+                // ✅ Redirigir al NUEVO ENLACE (evitando 404)
                 setTimeout(() => {
-                    window.location.href = "https://luishparedes.github.io/magica_pro-web/";
+                    window.location.href = SECURITY_CONFIG.REDIRECT_URL;
                 }, 500);
             }
         }
@@ -260,8 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (result.valid) {
             showMessage("✅ Acceso concedido...", "success");
+            // ✅ Redirigir al NUEVO ENLACE (evitando 404)
             setTimeout(() => {
-                window.location.href = "https://luishparedes.github.io/magica_pro-web/";
+                window.location.href = SECURITY_CONFIG.REDIRECT_URL;
             }, 1500);
         } else {
             showMessage(`❌ ${result.error}`, "error");
