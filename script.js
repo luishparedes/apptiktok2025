@@ -8,12 +8,15 @@ const SECURITY_CONFIG = {
     REDIRECT_URL: "https://luishparedes.github.io/magica_pro-web/" // ✅ NUEVA URL CENTRALIZADA
 };
 
-// ==================== PROTECCIÓN F12 - SOLO COMPUTADORAS ====================
+// ==================== PROTECCIÓN F12 MEJORADA - SOLO COMPUTADORAS ====================
 class F12Protection {
     constructor() {
         this.isMobile = this.checkIfMobile();
+        this.devToolsOpen = false;
+        this.attemptCount = 0;
+        
         if (!this.isMobile) {
-            this.initProtection();
+            this.initAdvancedProtection();
         }
     }
 
@@ -21,122 +24,270 @@ class F12Protection {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
-    initProtection() {
-        // Detectar apertura de DevTools (F12, Ctrl+Shift+I, etc.)
-        this.detectDevToolsOpen();
-        
-        // Prevenir acceso al menú contextual (clic derecho)
+    initAdvancedProtection() {
+        // Múltiples métodos de detección
+        this.detectByDimensions();
+        this.detectByDebugger();
+        this.detectByPerformance();
+        this.detectByConsole();
+        this.preventShortcuts();
         this.preventContextMenu();
-        
-        // Deshabilitar teclas de acceso directo a DevTools
-        this.disableShortcuts();
-        
-        // Detectar cambio de tamaño de ventana (método de detección de DevTools)
-        this.detectResize();
+        this.monitorContinuously();
     }
 
-    detectDevToolsOpen() {
-        const threshold = 160;
-        const check = () => {
-            const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-            const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+    detectByDimensions() {
+        const checkDevTools = () => {
+            const widthDifference = window.outerWidth - window.innerWidth;
+            const heightDifference = window.outerHeight - window.innerHeight;
             
-            if (widthThreshold || heightThreshold) {
-                this.handleDevToolsDetected();
+            if (widthDifference > 200 || heightDifference > 200) {
+                this.handleViolation("DevTools detectado por dimensiones");
+                return;
             }
         };
         
-        setInterval(check, 1000);
+        setInterval(checkDevTools, 500);
+    }
+
+    detectByDebugger() {
+        const startTime = Date.now();
+        debugger;
+        const endTime = Date.now();
+        
+        if (endTime - startTime > 100) {
+            this.handleViolation("Debugger detectado");
+        }
+    }
+
+    detectByPerformance() {
+        const perf = performance.now();
+        const start = Date.now();
+        
+        while (Date.now() - start < 100) {
+            // Loop intencional
+        }
+        
+        if (performance.now() - perf > 200) {
+            this.handleViolation("Análisis de performance detectado");
+        }
+    }
+
+    detectByConsole() {
+        const dummy = () => {};
+        console.log = dummy;
+        console.warn = dummy;
+        console.error = dummy;
+        console.info = dummy;
+        console.debug = dummy;
+        console.table = dummy;
+        console.clear = dummy;
+        
+        // Detectar acceso a console
+        Object.defineProperty(window, 'console', {
+            get: () => {
+                this.handleViolation("Acceso a consola detectado");
+                return {
+                    log: dummy,
+                    warn: dummy,
+                    error: dummy,
+                    info: dummy,
+                    debug: dummy,
+                    table: dummy,
+                    clear: dummy
+                };
+            }
+        });
+    }
+
+    preventShortcuts() {
+        const blockedKeys = new Set([
+            123, // F12
+            73,  // I
+            74,  // J
+            85,  // U
+            83,  // S
+            67   // C
+        ]);
+
+        const blockedCombinations = [
+            { ctrl: true, shift: true, key: 73 }, // Ctrl+Shift+I
+            { ctrl: true, shift: true, key: 74 }, // Ctrl+Shift+J
+            { ctrl: true, shift: true, key: 67 }, // Ctrl+Shift+C
+            { ctrl: true, key: 85 }, // Ctrl+U
+            { ctrl: true, key: 83 }, // Ctrl+S
+            { alt: true, key: 115 } // Alt+F4 (pero F4 es 115)
+        ];
+
+        document.addEventListener('keydown', (e) => {
+            // Bloquear teclas individuales
+            if (blockedKeys.has(e.keyCode)) {
+                if (e.keyCode === 123) { // F12
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleViolation("F12 presionado");
+                    return false;
+                }
+            }
+
+            // Bloquear combinaciones
+            for (const combo of blockedCombinations) {
+                if ((combo.ctrl === undefined || combo.ctrl === e.ctrlKey) &&
+                    (combo.shift === undefined || combo.shift === e.shiftKey) &&
+                    (combo.alt === undefined || combo.alt === e.altKey) &&
+                    e.keyCode === combo.key) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleViolation("Combinación de teclas bloqueada");
+                    return false;
+                }
+            }
+
+            // Bloquear menú contextual con teclado (Shift+F10)
+            if (e.shiftKey && e.keyCode === 121) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.handleViolation("Menú contextual con teclado");
+                return false;
+            }
+        }, true);
+
+        // Capturar evento a nivel de window también
+        window.addEventListener('keydown', (e) => {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
     }
 
     preventContextMenu() {
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            this.showWarning();
-        });
+            e.stopPropagation();
+            this.handleViolation("Clic derecho bloqueado");
+            return false;
+        }, true);
+
+        // También prevenir el menú contextual en elementos específicos
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+        }, true);
+
+        document.addEventListener('selectstart', (e) => {
+            e.preventDefault();
+            return false;
+        }, true);
     }
 
-    disableShortcuts() {
-        document.addEventListener('keydown', (e) => {
-            // F12
-            if (e.keyCode === 123) {
-                e.preventDefault();
-                this.showWarning();
-                return false;
-            }
-            
-            // Ctrl+Shift+I
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-                e.preventDefault();
-                this.showWarning();
-                return false;
-            }
-            
-            // Ctrl+Shift+J
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
-                e.preventDefault();
-                this.showWarning();
-                return false;
-            }
-            
-            // Ctrl+U
-            if (e.ctrlKey && e.keyCode === 85) {
-                e.preventDefault();
-                this.showWarning();
-                return false;
-            }
-        });
-    }
-
-    detectResize() {
-        let lastWidth = window.innerWidth;
-        let lastHeight = window.innerHeight;
-        
+    monitorContinuously() {
+        // Monitoreo continuo cada 2 segundos
         setInterval(() => {
-            if (window.innerWidth !== lastWidth || window.innerHeight !== lastHeight) {
-                lastWidth = window.innerWidth;
-                lastHeight = window.innerHeight;
-                // Solo activar si el cambio es significativo
-                if (Math.abs(window.outerWidth - window.innerWidth) > 100 || 
-                    Math.abs(window.outerHeight - window.innerHeight) > 100) {
-                    this.handleDevToolsDetected();
-                }
-            }
-        }, 500);
-    }
-
-    handleDevToolsDetected() {
-        // Redirigir o tomar acción cuando se detectan DevTools
-        document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #fff; font-family: Arial;">⚠️ Acceso no autorizado detectado</div>';
-        
-        setTimeout(() => {
-            window.location.href = SECURITY_CONFIG.REDIRECT_URL;
+            this.detectByDimensions();
+            this.checkViewport();
         }, 2000);
     }
 
-    showWarning() {
+    checkViewport() {
+        const viewport = window.visualViewport;
+        if (viewport && (viewport.width !== window.innerWidth || viewport.height !== window.innerHeight)) {
+            this.handleViolation("Viewport inconsistente detectado");
+        }
+    }
+
+    handleViolation(reason) {
+        this.attemptCount++;
+        
+        console.warn(`⚠️ Violación de seguridad: ${reason} (Intento: ${this.attemptCount})`);
+        
+        if (this.attemptCount >= 2) {
+            this.takeAction();
+        } else {
+            this.showWarning(`⚠️ Acción no permitida (${this.attemptCount}/2)`);
+        }
+    }
+
+    showWarning(message) {
+        // Remover advertencia anterior si existe
+        const existingWarning = document.getElementById('f12-warning');
+        if (existingWarning) {
+            document.body.removeChild(existingWarning);
+        }
+
         const warning = document.createElement('div');
+        warning.id = 'f12-warning';
         warning.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
             background: #ff4444;
             color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            z-index: 9999;
-            font-family: Arial;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
             font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 2px solid #ff0000;
+            max-width: 300px;
+            text-align: center;
         `;
-        warning.textContent = '⚠️ Acción no permitida';
+        warning.textContent = message;
         document.body.appendChild(warning);
         
         setTimeout(() => {
             if (document.body.contains(warning)) {
                 document.body.removeChild(warning);
             }
-        }, 2000);
+        }, 3000);
     }
+
+    takeAction() {
+        // Acciones más drásticas después de múltiples intentos
+        document.body.innerHTML = `
+            <div style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background: linear-gradient(135deg, #000000, #333333);
+                color: #fff;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 20px;
+            ">
+                <div>
+                    <h1 style="color: #ff4444; font-size: 24px; margin-bottom: 20px;">
+                        ⚠️ ACCESO NO AUTORIZADO DETECTADO
+                    </h1>
+                    <p style="margin-bottom: 20px; font-size: 16px;">
+                        Se ha detectado un intento de acceso a herramientas de desarrollo.<br>
+                        Esta acción no está permitida por políticas de seguridad.
+                    </p>
+                    <p style="color: #cccccc; font-size: 14px;">
+                        Redirigiendo en 3 segundos...
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            // Limpiar todo y redirigir
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = SECURITY_CONFIG.REDIRECT_URL;
+        }, 3000);
+    }
+}
+
+// Inicializar protección inmediatamente (no esperar a DOMContentLoaded)
+if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    // Ejecutar inmediatamente
+    setTimeout(() => {
+        new F12Protection();
+    }, 100);
 }
 
 // 🏷️ Códigos válidos (ofuscados con encoding múltiple)
